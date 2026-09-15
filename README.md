@@ -48,27 +48,6 @@ download:
 xattr -dr com.apple.quarantine path/to/max path/to/pd
 ```
 
-
-## How the two core opcodes work
-
-**squinewave~.** One period is four segments: a half cosine sweeping down, a flat part at -1, a
-half cosine sweeping up, a flat part at +1. *Clip* shortens the sweeps and lengthens the flat
-parts, from a sine (no flat parts) to a square (sweeps as short as allowed). *Skew* moves the
-point between the down and the up half, from a symmetric wave to a narrow pulse or, with the flat
-parts gone, a sawtooth. A sweep never gets shorter than a few samples (`minsweep`, about sr/3000),
-which caps the slope of every edge: that is what keeps the high harmonics, and the aliasing, under
-control without oversampling or wavetables. The oscillator also takes a hard sync input and gives
-a sync output at the start of each period, used here for osc 2 synced to osc 1.
-
-**moogladder2~.** A digital model of the transistor ladder (Huovilainen's improved model): four
-one pole lowpass stages in series, each with a `tanh` on its input difference as the transistor
-pairs, and the output fed back to the input scaled by the resonance (4 x resonance: the filter
-self oscillates near 1). It runs at twice the sample rate with a half sample delay to compensate
-the phase of the feedback, and polynomial corrections of the tuning and of the resonance gain keep
-cutoff and emphasis in place up the range. Cutoff and resonance are audio rate and the
-coefficients are recomputed only when they change. `moogladder2` differs from Csound's
-`moogladder` by a faster `tanh` approximation and by clamping negative resonance.
-
 ## Build
 
 Dependencies, not included in this repository:
